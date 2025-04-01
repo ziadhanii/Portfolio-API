@@ -8,6 +8,11 @@ public class ApplicationDbContext(
     public DbSet<Technology> Technologies { get; set; }
     public DbSet<ProjectTechnology> ProjectTechnologies { get; set; }
     public DbSet<Skill> Skills { get; set; }
+    public DbSet<ProjectAnalytics> ProjectAnalytics { get; set; }
+    public DbSet<ProjectVisit> ProjectVisits { get; set; }
+    public DbSet<WebsiteAnalytics> WebsiteAnalytics { get; set; }
+    public DbSet<WebsiteVisit> WebsiteVisits { get; set; }
+    public DbSet<Certificate> Certificates { get; set; }
     
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

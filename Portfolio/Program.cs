@@ -23,6 +23,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
+    c.CustomSchemaIds(type => type.FullName);
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",

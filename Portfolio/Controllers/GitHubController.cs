@@ -1,54 +1,119 @@
-using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc;
+using Portfolio.DTOs;
+using Portfolio.Services;
 
 namespace Portfolio.Controllers;
 
+
 public class GitHubController : BaseApiController
 {
-    private readonly HttpClient _httpClient;
-    private readonly string _gitHubToken;
+    private readonly IGitHubService _gitHubService;
+    private readonly ILogger<GitHubController> _logger;
 
-    public GitHubController(IHttpClientFactory httpClientFactory, IConfiguration config)
+    public GitHubController(
+        IGitHubService gitHubService,
+        ILogger<GitHubController> logger)
     {
-        _httpClient = httpClientFactory.CreateClient("GitHub");
-        _gitHubToken = config["GitHub:Token"] ?? "";
-
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _gitHubToken);
+        _gitHubService = gitHubService;
+        _logger = logger;
     }
 
-    [HttpGet("user")]
-    public async Task<IActionResult> GetGitHubUser()
+    /// <summary>
+    /// Get GitHub user profile information
+    /// </summary>
+    [HttpGet("profile")]
+    [ProducesResponseType(typeof(GitHubUserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetGitHubProfile()
     {
-        var response = await _httpClient.GetAsync("https://api.github.com/user");
+        try
+        {
+            var profile = await _gitHubService.GetUserAsync();
+            return Ok(profile);
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Error fetching GitHub profile");
+            return StatusCode(500, "Failed to fetch GitHub profile");
+        }
+    }
 
-        if (!response.IsSuccessStatusCode)
-            return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+    /// <summary>
+    /// Get featured GitHub projects
+    /// </summary>
+    [HttpGet("projects")]
+    [ProducesResponseType(typeof(FeaturedProjectsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetFeaturedProjects()
+    {
+        try
+        {
+            var projects = await _gitHubService.GetFeaturedProjectsAsync();
+            return Ok(projects);
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Error fetching featured projects");
+            return StatusCode(500, "Failed to fetch featured projects");
+        }
+    }
 
-        var user = await response.Content.ReadFromJsonAsync<GitHubUserDto>();
-        return Ok(user);
+    /// <summary>
+    /// Get private GitHub repositories
+    /// </summary>
+    [HttpGet("private-repos")]
+    [ProducesResponseType(typeof(List<GitHubRepoDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetPrivateRepos()
+    {
+        try
+        {
+            var repos = await _gitHubService.GetPrivateReposAsync();
+            return Ok(repos);
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Error fetching private repositories");
+            return StatusCode(500, "Failed to fetch private repositories");
+        }
     }
 
     [HttpGet("repos")]
-    public async Task<IActionResult> GetGitHubRepos()
+    [ProducesResponseType(typeof(List<GitHubRepoDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetGitHubRepos([FromQuery] int page = 1, [FromQuery] int perPage = 30)
     {
-        var response = await _httpClient.GetAsync("https://api.github.com/user/repos");
-
-        if (!response.IsSuccessStatusCode)
-            return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
-
-        var repos = await response.Content.ReadFromJsonAsync<List<GitHubRepoDto>>();
-        return Ok(repos);
+        try
+        {
+            var repos = await _gitHubService.GetReposAsync(page, perPage);
+            return Ok(repos);
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Error fetching GitHub repositories");
+            return StatusCode(500, "Failed to fetch GitHub repositories");
+        }
     }
 
-    [HttpGet("repos/{repoName}")]
-    public async Task<IActionResult> GetGitHubRepo(string repoName)
+    [HttpGet("repos/{owner}/{repoName}")]
+    [ProducesResponseType(typeof(GitHubRepoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetGitHubRepo(string owner, string repoName)
     {
-        var response = await _httpClient.GetAsync($"https://api.github.com/repos/ziadhanii/{repoName}");
-
-        if (!response.IsSuccessStatusCode)
-            return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
-
-        var repo = await response.Content.ReadFromJsonAsync<GitHubRepoDto>();
-        return Ok(repo);
+        try
+        {
+            var repo = await _gitHubService.GetRepoAsync(owner, repoName);
+            return Ok(repo);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Error fetching GitHub repository {Owner}/{RepoName}", owner, repoName);
+            return StatusCode(500, "Failed to fetch GitHub repository");
+        }
     }
 }
 

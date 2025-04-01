@@ -11,5 +11,7 @@ public class CreateProjectDto
     [Required, Url] public required string ProjectUrl { get; set; }
 
     [Url] public required string GitHubRepo { get; set; }
+
+    public List<int> TechnologyIds { get; set; } = new();
     
 }

@@ -34,11 +34,23 @@ public class ProjectsController(ApplicationDbContext context, IMapper mapper, IP
     [HttpPost]
     public async Task<ActionResult<ProjectDto>> CreateProject([FromForm] CreateProjectDto projectDto)
     {
-        
         var project = mapper.Map<Project>(projectDto);
-
         project.CreatedAt = DateTime.UtcNow;
         project.ImageUrl = await pictureService.SavePicture(projectDto.Image, Request);
+
+        // Add technologies to the project
+        if (projectDto.TechnologyIds?.Any() == true)
+        {
+            var technologies = await context.Technologies
+                .Where(t => projectDto.TechnologyIds.Contains(t.Id))
+                .ToListAsync();
+
+            project.ProjectTechnologies = technologies.Select(t => new ProjectTechnology
+            {
+                Project = project,
+                Technology = t
+            }).ToList();
+        }
 
         context.Projects.Add(project);
         await context.SaveChangesAsync();
@@ -94,5 +106,15 @@ public class ProjectsController(ApplicationDbContext context, IMapper mapper, IP
             return NotFound();
 
         return Ok(mapper.Map<List<TechnologyResponseDto>>(project.ProjectTechnologies.Select(pt => pt.Technology)));
+    }
+
+    [HttpGet("available-technologies")]
+    public async Task<ActionResult<List<TechnologyResponseDto>>> GetAvailableTechnologies()
+    {
+        var technologies = await context.Technologies
+            .OrderBy(t => t.Name)
+            .ToListAsync();
+
+        return Ok(mapper.Map<List<TechnologyResponseDto>>(technologies));
     }
 }
