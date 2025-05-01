@@ -1,7 +1,7 @@
 using Portfolio.Contracts.Interfaces;
 using Portfolio.Mapping;
+using Portfolio.Models;
 using Portfolio.Services;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Portfolio;
 
@@ -23,11 +23,15 @@ public static class DependencyInjection
         );
         services.AddAutoMapper(typeof(MappingProfile));
 
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+        
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPictureService, PictureService>();
+        services.AddScoped<IPdfService, PdfService>();
         services.AddScoped<IGitHubService, GitHubService>();
-        services.AddScoped<IUnifiedAnalyticsService, UnifiedAnalyticsService>();
         services.AddScoped<ICertificateService, CertificateService>();
+        services.AddScoped<IAnalyticsService, AnalyticsService>();
+        services.AddScoped<IContactService, ContactService>();
 
         services.AddAuthConfig(configuration);
 

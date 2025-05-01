@@ -67,4 +67,5 @@ public class PictureService : IPictureService
 public static class FileSettings
 {
     public static string ImagesPath => "Images"; // بدل "/Images"
+    public static string PdfsPath => "Pdfs";
 }

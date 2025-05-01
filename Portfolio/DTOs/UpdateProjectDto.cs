@@ -7,4 +7,6 @@ public class UpdateProjectDto
     public IFormFile? Image { get; set; }
     public string ProjectUrl { get; set; } = string.Empty;
     public string GitHubRepo { get; set; } = string.Empty;
+    
+    public List<int> TechnologyIds { get; set; } = [];
 }

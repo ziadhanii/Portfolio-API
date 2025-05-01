@@ -12,4 +12,5 @@ public class AuthenticationController(IAuthService authService) : BaseApiControl
 
         return authResult.IsSuccess ? Ok(authResult.Value) : authResult.ToProblem();
     }
+    
 }

@@ -62,15 +62,31 @@ public class ProjectsController(ApplicationDbContext context, IMapper mapper, IP
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateProject(int id, [FromForm] UpdateProjectDto projectDto)
     {
-        var project = await context.Projects.FindAsync(id);
+        var project = await context.Projects
+            .Include(p => p.ProjectTechnologies)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
         if (project == null) return NotFound();
-
-
 
         mapper.Map(projectDto, project);
 
         if (projectDto.Image is not null)
             project.ImageUrl = await pictureService.UpdatePictureAsync(projectDto.Image, project.ImageUrl, Request);
+
+        if (projectDto.TechnologyIds?.Any() == true)
+        {
+            project.ProjectTechnologies.Clear();
+
+            var technologies = await context.Technologies
+                .Where(t => projectDto.TechnologyIds.Contains(t.Id))
+                .ToListAsync();
+
+            project.ProjectTechnologies = technologies.Select(t => new ProjectTechnology
+            {
+                ProjectId = project.Id,
+                TechnologyId = t.Id
+            }).ToList();
+        }
 
         await context.SaveChangesAsync();
         return NoContent();

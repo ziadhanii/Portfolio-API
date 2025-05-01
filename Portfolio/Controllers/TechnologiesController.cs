@@ -44,12 +44,13 @@ public class TechnologiesController(ApplicationDbContext context, IMapper mapper
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateTechnology(int id, TechnologyCreateDto technologyDto)
+    public async Task<IActionResult> UpdateTechnology(int id, TechnologyUpdateDto technologyDto)
     {
         var technology = await context.Technologies.FindAsync(id);
         if (technology == null) return NotFound("Technology not found.");
 
-        technology.Name = technologyDto.Name;
+        technology.Name = technologyDto.Name ?? technology.Name;
+        technology.Color = technologyDto.Color ?? technology.Color;
 
         try
         {

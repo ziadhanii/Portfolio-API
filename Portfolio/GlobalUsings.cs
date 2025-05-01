@@ -20,3 +20,5 @@ global using System.ComponentModel.DataAnnotations;
 global using Portfolio.Abstractions;
 global using Microsoft.AspNetCore.Diagnostics;
 global using Portfolio.Errors;
+global using Portfolio.DTOs;
+global using Portfolio.Interfaces;

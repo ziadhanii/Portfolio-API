@@ -13,7 +13,8 @@ public sealed class ApplicationUser : IdentityUser
     public string Location { get; set; } = string.Empty;
     public string LinkedInUrl { get; set; } = string.Empty;
     public string GitHubUrl { get; set; } = string.Empty;
-
+    
+    public string CvUrl { get; set; } = string.Empty;
     public DateTime DateCreated { get; set; }
 
 }

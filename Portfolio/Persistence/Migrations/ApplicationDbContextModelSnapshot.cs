@@ -172,6 +172,10 @@ namespace Portfolio.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CvUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateCreated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -270,6 +274,46 @@ namespace Portfolio.Persistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Portfolio.Entities.Certificate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CertificateUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Certificates");
+                });
+
             modelBuilder.Entity("Portfolio.Entities.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -308,6 +352,33 @@ namespace Portfolio.Persistence.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("Portfolio.Entities.ProjectAnalytics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ViewsCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VisitsCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectAnalytics");
+                });
+
             modelBuilder.Entity("Portfolio.Entities.ProjectTechnology", b =>
                 {
                     b.Property<int>("ProjectId")
@@ -321,6 +392,39 @@ namespace Portfolio.Persistence.Migrations
                     b.HasIndex("TechnologyId");
 
                     b.ToTable("ProjectTechnologies");
+                });
+
+            modelBuilder.Entity("Portfolio.Entities.ProjectVisit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectAnalyticsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Referrer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectAnalyticsId");
+
+                    b.ToTable("ProjectVisits");
                 });
 
             modelBuilder.Entity("Portfolio.Entities.Skill", b =>
@@ -338,9 +442,35 @@ namespace Portfolio.Persistence.Migrations
                     b.Property<int>("Proficiency")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StackId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("StackId");
+
                     b.ToTable("Skills");
+                });
+
+            modelBuilder.Entity("Portfolio.Entities.Stack", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Stacks");
                 });
 
             modelBuilder.Entity("Portfolio.Entities.Technology", b =>
@@ -351,6 +481,10 @@ namespace Portfolio.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -358,48 +492,80 @@ namespace Portfolio.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Technologies");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "C#"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "ASP.NET Core"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Entity Framework Core"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Angular"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "React"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Docker"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Azure"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "SQL Server"
-                        });
+            modelBuilder.Entity("Portfolio.Entities.WebsiteAnalytics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PageTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UniqueVisitsCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ViewsCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WebsiteAnalytics");
+                });
+
+            modelBuilder.Entity("Portfolio.Entities.WebsiteVisit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PageTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Referrer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TimeSpent")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("WebsiteAnalyticsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebsiteAnalyticsId");
+
+                    b.ToTable("WebsiteVisits");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -453,6 +619,17 @@ namespace Portfolio.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Portfolio.Entities.ProjectAnalytics", b =>
+                {
+                    b.HasOne("Portfolio.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Portfolio.Entities.ProjectTechnology", b =>
                 {
                     b.HasOne("Portfolio.Entities.Project", "Project")
@@ -472,14 +649,54 @@ namespace Portfolio.Persistence.Migrations
                     b.Navigation("Technology");
                 });
 
+            modelBuilder.Entity("Portfolio.Entities.ProjectVisit", b =>
+                {
+                    b.HasOne("Portfolio.Entities.ProjectAnalytics", "ProjectAnalytics")
+                        .WithMany("Visits")
+                        .HasForeignKey("ProjectAnalyticsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProjectAnalytics");
+                });
+
+            modelBuilder.Entity("Portfolio.Entities.Skill", b =>
+                {
+                    b.HasOne("Portfolio.Entities.Stack", null)
+                        .WithMany("Skills")
+                        .HasForeignKey("StackId");
+                });
+
+            modelBuilder.Entity("Portfolio.Entities.WebsiteVisit", b =>
+                {
+                    b.HasOne("Portfolio.Entities.WebsiteAnalytics", null)
+                        .WithMany("Visits")
+                        .HasForeignKey("WebsiteAnalyticsId");
+                });
+
             modelBuilder.Entity("Portfolio.Entities.Project", b =>
                 {
                     b.Navigation("ProjectTechnologies");
                 });
 
+            modelBuilder.Entity("Portfolio.Entities.ProjectAnalytics", b =>
+                {
+                    b.Navigation("Visits");
+                });
+
+            modelBuilder.Entity("Portfolio.Entities.Stack", b =>
+                {
+                    b.Navigation("Skills");
+                });
+
             modelBuilder.Entity("Portfolio.Entities.Technology", b =>
                 {
                     b.Navigation("ProjectTechnologies");
+                });
+
+            modelBuilder.Entity("Portfolio.Entities.WebsiteAnalytics", b =>
+                {
+                    b.Navigation("Visits");
                 });
 #pragma warning restore 612, 618
         }

@@ -13,6 +13,8 @@ public class MappingProfile : Profile
                 opt => opt.MapFrom(p => p.ProjectTechnologies.Select(pt => pt.Technology)));
 
         CreateMap<CreateProjectDto, Project>();
+        CreateMap<UpdateProjectDto, Project>();
+        
 
         CreateMap<Technology, TechnologyResponseDto>();
         CreateMap<TechnologyCreateDto, Technology>();

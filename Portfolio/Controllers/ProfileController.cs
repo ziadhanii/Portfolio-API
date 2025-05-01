@@ -1,18 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
-using Portfolio.DTOs;
 using Portfolio.Services;
 
 namespace Portfolio.Controllers;
 
-[Authorize]
 public class ProfileController(UserManager<ApplicationUser> userManager, IPictureService pictureService)
     : BaseApiController
 {
-
     [HttpGet("")]
     public async Task<ActionResult<UserProfileDto>> GetProfile()
     {
-        
         var user = await userManager.Users.FirstOrDefaultAsync();
 
         if (user == null)
@@ -31,7 +26,8 @@ public class ProfileController(UserManager<ApplicationUser> userManager, IPictur
             LinkedInUrl = user.LinkedInUrl,
             GitHubUrl = user.GitHubUrl,
             Email = user.Email,
-            PhoneNumber = user.PhoneNumber
+            PhoneNumber = user.PhoneNumber,
+            CvUrl = user.CvUrl
         };
 
         return Ok(profileDto);
@@ -40,7 +36,6 @@ public class ProfileController(UserManager<ApplicationUser> userManager, IPictur
     [HttpPut("")]
     public async Task<IActionResult> UpdateProfile([FromForm] UpdateUserProfileDto profileDto)
     {
-        
         var user = await userManager.Users.FirstOrDefaultAsync();
 
         if (user == null)
@@ -56,6 +51,7 @@ public class ProfileController(UserManager<ApplicationUser> userManager, IPictur
         user.LinkedInUrl = profileDto.LinkedInUrl ?? user.LinkedInUrl;
         user.GitHubUrl = profileDto.GitHubUrl ?? user.GitHubUrl;
         user.PhoneNumber = profileDto.PhoneNumber ?? user.PhoneNumber;
+        user.CvUrl = profileDto.CvUrl ?? user.CvUrl;
 
 
         if (profileDto.ProfileImage != null)
